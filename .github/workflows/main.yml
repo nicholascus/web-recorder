@@ -22,4 +22,14 @@ jobs:
           node-version: '20.x'
       - run: yarn
       - run: yarn tsc
+  test:
+    runs-on: ubuntu-latest
+    name: Check typescript
+    needs: [lint, tsc]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '20.x'
+      - run: yarn
       - run: yarn test
