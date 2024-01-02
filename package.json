@@ -8,9 +8,11 @@
   "dependencies": {
     "@types/node": "^20.10.5",
     "playwright": "^1.40.1",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "urijs": "^1.19.11"
   },
   "devDependencies": {
+    "@types/urijs": "^1.19.25",
     "typescript": "^5.3.3"
   },
   "scripts": {

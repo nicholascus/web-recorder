@@ -28,6 +28,7 @@
 
 import { Browser, BrowserContext, Locator, Page, chromium } from 'playwright';  // Or 'firefox' or 'webkit'.
 import { URL } from 'url';
+import URI from 'urijs';
 
 async function findAsyncSequential<T>(
     array: T[],
@@ -39,6 +40,17 @@ async function findAsyncSequential<T>(
       }
     }
     return undefined;
+  }
+
+  async function mapAsyncSequential<T,G>(
+    array: T[],
+    predicate: (t: T) => Promise<G>,
+  ): Promise<G[]> {
+    const result: G[] = [];
+    for (const t of array) {
+      result.push(await predicate(t));
+    }
+    return result;
   }
 
 async function attachParsers(page: Page) {
@@ -60,8 +72,18 @@ async function attachParsers(page: Page) {
                     return true;
                 }
             }));
-        } else if (url.host === "linkedin.com" && url.pathname.startsWith("/jobs/collections")) {
-
+        } else if ((url.host === "linkedin.com" || url.host === "www.linkedin.com") && url.pathname.startsWith("/jobs/collections")) {
+            await outputNewJobs(page);
+            page.on('request', async (...args) => {
+                await outputNewJobs(page);
+            });
+            a.push(page.waitForEvent('close', {
+                timeout: 0,
+                predicate: (p: Page) => {
+                    console.log(`!!PAGE CLOSED!! ${title}`);
+                    return true;
+                }
+            }));
         }
     } catch (e) {
         console.log(`failed to get page title due to ${e}`)
@@ -164,9 +186,78 @@ async function outputNewTweets(page: Page) {
 
         }
     }
-}  
+}
+
+
+class Job {
+    uid: string;
+    time: string;
+    title: string;
+    company: string;
+    meta: string[];
+    link: string;
+}
+
+class JobElement {
+    private element: Locator;
+    private job: Job = null;
+    constructor(element: Locator) {
+        this.element = element;
+    }
+    public async parse(page: Page): Promise<Job> {
+        if (!this.job) {
+            this.job = new Job();
+            // uid
+            // title: /descendant::*[contains(@class, "artdeco-entity-lockup__title")]
+            // uid: $x('(//*[@data-occludable-job-id])[25]/descendant::*[contains(@class, "artdeco-entity-lockup__title")]/descendant::a/@href');
+            // href="/jobs/view/3576445020/?eBP=NotAvailableFromMidTier&refId=T%2B0Xh3NRT4%2Bwvc7VmG7V3w%3D%3D&trackingId=LypTNJlTDcQiou%2BSHvEhig%3D%3D&trk=flagship3_top_applicant_jobs_collection"
+            // 
+            const job_link: Locator = this.element.locator('xpath=/descendant::*[contains(@class, "artdeco-entity-lockup__title")]/descendant::a');
+            // const cjob_link = (await this.element.locator('xpath=/descendant::*[contains(@class, "artdeco-entity-lockup__title")]/descendant::a').all()).length;
+            // const cjob_link_a = await job_link.textContent();
+            // const cjob_link_b = await job_link.innerText();
+            this.job.title = await job_link.innerText(); //cjob_link_b;
+            // const cjob_link_href = await job_link.getAttribute('href');
+            const job_url = new URI(await job_link.getAttribute('href'));
+            this.job.uid = job_url.pathname();
+            this.job.link = `https://linkedin.com${job_url.pathname}`;
+
+            // company: $x('(//*[@data-occludable-job-id])[25]/descendant::*[contains(@class, "job-card-container__primary-description")]');
+            this.job.company = await this.element.locator('xpath=/descendant::*[contains(@class, "job-card-container__primary-description")]').innerText();
+
+            // location: $x('(//*[@data-occludable-job-id])[25]/descendant::*[contains(@class, "job-card-container__metadata-item")]');
+            this.job.meta = await mapAsyncSequential(
+                await this.element.locator('xpath=/descendant::*[contains(@class, "job-card-container__metadata-item")]').all(),
+                async (e) => await e.innerText()
+            );
+
+            // time: $x('(//*[@data-occludable-job-id])[25]/descendant::time/@datetime'); 
+            this.job.time = await this.element.locator('xpath=/descendant::time').getAttribute('datetime');
+        }
+        return this.job;
+    }
+}
+
+const knownJobs = [];
+async function outputNewJobs(page: Page) {
+    const jobs: Locator[] = await page.locator('.scaffold-layout__list-container').locator('xpath=/descendant::*[@data-occludable-job-id]').all();
+    for(let i=0; i<jobs.length; i++) {
+        const job = new JobElement(jobs[i]);
+        try {
+            const j = await job.parse(page);
+            // console.log(`\n!FOUND_A_TWEET! ${page.url()} ${t.uid}`);
+            if (!knownJobs.includes(j.uid)) {
+                console.log(`\n!FOUND_NEW_JOB! uid=${j.uid}, time=${j.time}, title=${j.title}, company=${j.company}, meta=${JSON.stringify(j.meta)}, date=${j.time}`);
+                knownJobs.push(j.uid);
+            }
+        } catch (e) {
+            // console.log(`Failed to parse job ${e}`);
+        }
+    }
+}
 
 (async () => {
+    
     try {
         const browser: Browser = await chromium.connectOverCDP('http://localhost:9222');
         // browser.on('disconnected', () => process.exit());
@@ -178,6 +269,7 @@ async function outputNewTweets(page: Page) {
 
         for(let j=0; j<contexts.length; j++) {
             const context: BrowserContext = contexts[j];
+            context.setDefaultTimeout(1000);
             const pages: Page[] = context.pages();
             console.log(`!!CONTEXT!! N${j}`);
             context.on('page', (page) => {
