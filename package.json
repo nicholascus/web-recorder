@@ -16,6 +16,6 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "pwb": "ts-node start-playwright.ts"
+    "pwb": "ts-node src/start-playwright.ts"
   }
 }
