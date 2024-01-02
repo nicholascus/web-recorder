@@ -1,9 +1,9 @@
-import { Locator, Page } from "playwright";
+import { Locator, Page } from "playwright-core";
 import BaseEntity from "./BaseEntity";
 import IContentWriter from "./IContentWriter";
 import IWebParser from "./IWebParser";
 import URI from 'urijs';
-import ConsoleWriter from "./ConsoleWriter";
+import { ConsoleWriter } from "../writers/ConsoleWriter";
 
 export default abstract class AbstractWebParser<T extends BaseEntity> implements IWebParser<T> {
     protected readonly Writer = ConsoleWriter<T>;

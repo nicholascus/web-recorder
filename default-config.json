@@ -1,6 +1,6 @@
 {
     "parsers" : [
         { "parser": "LinkedInJobCollections", "logger": "ConsoleWriter"},
-        { "parser": "TwitterFeed", "logger": "ConsoleWriter"}
+        { "parser": "TwitterFeed"}
     ]
 }

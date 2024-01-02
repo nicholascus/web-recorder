@@ -1,4 +1,4 @@
-import { Browser, BrowserContext, Page, chromium } from "playwright";
+import { Browser, BrowserContext, Page, chromium } from "playwright-core";
 import ComponentLoader from "./ComponentLoader";
 import URI from "urijs";
 import IWebParser from "../base/IWebParser";

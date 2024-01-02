@@ -1,4 +1,4 @@
-import { Locator, Page } from "playwright";
+import type { Page } from "playwright-core";
 import URI from 'urijs';
 import BaseEntity from "./BaseEntity";
 import IContentWriter from "./IContentWriter";
