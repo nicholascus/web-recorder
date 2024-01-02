@@ -5,7 +5,7 @@ import IWebParser from "./IWebParser";
 import URI from 'urijs';
 
 export default abstract class AbstractWebParser<T extends BaseEntity> implements IWebParser {
-    uidProcessed: string[] = [];
+    uidProcessed: Set<string> = new Set<string>();;
     contentWriter: IContentWriter<T>;
 
     abstract extractUid(page: Page, element: Locator): Promise<string>;
@@ -14,12 +14,14 @@ export default abstract class AbstractWebParser<T extends BaseEntity> implements
     abstract findAllRecords(page: Page): Promise<Locator[]>;
     
     isNewElement(uid: string) {
-        return !this.uidProcessed.includes(uid);
+        return !this.uidProcessed.has(uid);
     }
 
     saveElement(element: T) {
-        this.contentWriter.log(element);
-        this.uidProcessed.push(element.uid);
+        if (this.isNewElement(element.uid)) {
+            this.contentWriter.log(element);
+            this.uidProcessed.add(element.uid);
+        }
     }
 
     async parsePageElement(page: Page, element: Locator): Promise<void> {
@@ -42,7 +44,7 @@ export default abstract class AbstractWebParser<T extends BaseEntity> implements
                 await this.parsePageElement(page, element);
             }
         } catch (e) {
-            
+
         }
     }
 

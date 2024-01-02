@@ -1,7 +1,9 @@
 /**
  * Design
+ * - cli
  * - runner
  *   - loads all parsers
+ *   - error logging and parsers debugging 
  *   - connect to browser / start browser
  *   - setup all browser tabs with the right parsers => all pages should have page.on('domcontentloaded', ...) attaching parser in them
  *   - see if the active window is new ? (intiate / reinitiate parser if requried) => context.on('page', ...)
@@ -28,9 +30,12 @@
 
 import { Browser, BrowserContext, Locator, Page, chromium } from 'playwright';  // Or 'firefox' or 'webkit'.
 import URI from 'urijs';
-import TwitterFeedParser, { TweetConsoleLogger } from './parsers/TwitterFeedParser';
-import LinkedInJobCollectionsParser, { LinkedInJobConsoleLogger } from './parsers/LinkedInJobCollectionsParser';
+import { TwitterFeedParser, TweetConsoleLogger } from './parsers/TwitterFeedParser';
+import { LinkedInJobCollectionsParser, LinkedInJobConsoleLogger } from './parsers/LinkedInJobCollectionsParser';
 import IWebParser from './base/IWebParser';
+import ComponentLoader from './engine/ComponentLoader';
+
+const componentLoader = new ComponentLoader();
 
 async function attachParsers(page: Page) {
     try {
@@ -40,10 +45,7 @@ async function attachParsers(page: Page) {
         console.log(`Page found. title: ${title} url:${pageurl}`);
         const uri = new URI(pageurl);
 
-        const parsers: IWebParser[] = [
-            new TwitterFeedParser(new TweetConsoleLogger()),
-            new LinkedInJobCollectionsParser(new LinkedInJobConsoleLogger()),
-        ];
+        const parsers: IWebParser[] = await componentLoader.getParsers();
         
         for(var i=0; i < parsers.length; i++) {
             const parser = parsers[i];
@@ -64,14 +66,12 @@ async function attachParsers(page: Page) {
     } catch (e) {
         console.log(`failed to get page title due to ${e}`)
     }
-
 }
 
 
 const a = [];
 
 (async () => {
-    
     try {
         const browser: Browser = await chromium.connectOverCDP('http://localhost:9222');
         // browser.on('disconnected', () => process.exit());

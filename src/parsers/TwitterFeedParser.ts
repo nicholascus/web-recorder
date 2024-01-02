@@ -5,7 +5,7 @@ import BaseEntity from '../base/BaseEntity';
 import AbstractWebParser from '../base/AbastractWebParser';
 import IContentWriter from '../base/IContentWriter';
 
-export default class TwitterFeedParser extends AbstractWebParser<Tweet> {
+export class TwitterFeedParser extends AbstractWebParser<Tweet> {
     async extractUid(page: Page, element: Locator): Promise<string> {
         // tweet id
         const tweetIdElement = element.locator('xpath=/descendant::a[contains(@href,"status")]').first();

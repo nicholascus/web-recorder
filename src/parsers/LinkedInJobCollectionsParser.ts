@@ -5,7 +5,7 @@ import BaseEntity from '../base/BaseEntity';
 import { mapAsyncSequential } from '../engine/Util';
 import IContentWriter from '../base/IContentWriter';
 
-export default class LinkedInJobCollectionsParser extends AbstractWebParser<Job> {
+export class LinkedInJobCollectionsParser extends AbstractWebParser<Job> {
     async extractUid(page: Page, element: Locator): Promise<string> {
         const job_link: Locator = element.locator('xpath=/descendant::*[contains(@class, "artdeco-entity-lockup__title")]/descendant::a');
         const job_url = new URI(await job_link.getAttribute('href'));
