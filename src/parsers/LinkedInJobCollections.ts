@@ -16,10 +16,10 @@ export class LinkedInJobCollections extends AbstractWebParser<Job> {
     async extractFullRecord(page: Page, element: Locator): Promise<Job> {
         const job = new Job();
         const job_link: Locator = element.locator('xpath=/descendant::*[contains(@class, "artdeco-entity-lockup__title")]/descendant::a');
-        job.title = await job_link.innerText(); //cjob_link_b;
+        job.title = await job_link.innerText();
         const job_url = new URI(await job_link.getAttribute('href'));
         job.uid = job_url.pathname();
-        job.link = `https://linkedin.com${job_url.pathname}`;
+        job.link = `https://linkedin.com${job_url.pathname()}`;
 
         job.company = await element.locator('xpath=/descendant::*[contains(@class, "job-card-container__primary-description")]').innerText();
 
