@@ -7,7 +7,7 @@
     "esModuleInterop": true,
     "strict": false,
     "lib": [],
-    "types": ["node", "playwright-core"],
+    "types": ["node", "jest", "playwright-core"],
     "moduleResolution": "node",
     "skipLibCheck": true
   }

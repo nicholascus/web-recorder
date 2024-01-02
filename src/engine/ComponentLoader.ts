@@ -6,11 +6,11 @@ import IContentWriter from '../base/IContentWriter';
 let instance = null;
 
 export default class ComponentLoader {
-    private classCache = new Map<string, any>();
+    protected classCache = new Map<string, any>();
 
-    private constructor() {}
+    protected constructor() {}
 
-    private async instantiateClassFromPath<T>(
+    protected async instantiateClassFromPath<T>(
         paths: string[],
         className: string,
     ): Promise<T | undefined> {
@@ -37,7 +37,7 @@ export default class ComponentLoader {
         );
     }
 
-    private getSearchDirs(fileName: string) {
+    protected getSearchDirs(fileName: string) {
         return [
             '.',
             path.resolve(__dirname, `../parsers`),
