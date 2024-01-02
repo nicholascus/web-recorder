@@ -30,7 +30,7 @@
 
 import { Bootstrap } from './engine/Bootstrap';
 
-(async () => {
+(async () => { //?? is that actually required ??
     await new Bootstrap().run();
 })();
 

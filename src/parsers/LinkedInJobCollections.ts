@@ -5,7 +5,15 @@ import BaseEntity from '../base/BaseEntity';
 import { mapAsyncSequential } from '../engine/Util';
 import IContentWriter from '../base/IContentWriter';
 
+export namespace LinkedInJobCollections {
+    export type Parser = LinkedInJobCollectionsParser;
+    export type DataEntity = Job;
+    export type Writer = LinkedInJobConsoleLogger;
+}
+
 export class LinkedInJobCollectionsParser extends AbstractWebParser<Job> {
+    protected readonly Writer = LinkedInJobConsoleLogger;
+
     async extractUid(page: Page, element: Locator): Promise<string> {
         const job_link: Locator = element.locator('xpath=/descendant::*[contains(@class, "artdeco-entity-lockup__title")]/descendant::a');
         const job_url = new URI(await job_link.getAttribute('href'));

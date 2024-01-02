@@ -1,11 +1,13 @@
-import { Browser, BrowserContext, Locator, Page, chromium } from 'playwright';  // Or 'firefox' or 'webkit'.
+import { Locator, Page } from 'playwright';  // Or 'firefox' or 'webkit'.
 import { URL } from 'url';
 import URI from 'urijs';
 import BaseEntity from '../base/BaseEntity';
 import AbstractWebParser from '../base/AbastractWebParser';
 import IContentWriter from '../base/IContentWriter';
 
-export class TwitterFeedParser extends AbstractWebParser<Tweet> {
+export class TwitterFeed extends AbstractWebParser<Tweet> {
+    protected readonly Writer = TweetConsoleLogger;
+
     async extractUid(page: Page, element: Locator): Promise<string> {
         // tweet id
         const tweetIdElement = element.locator('xpath=/descendant::a[contains(@href,"status")]').first();

@@ -3,8 +3,11 @@ import BaseEntity from "./BaseEntity";
 import IContentWriter from "./IContentWriter";
 import IWebParser from "./IWebParser";
 import URI from 'urijs';
+import ConsoleWriter from "./ConsoleWriter";
 
 export default abstract class AbstractWebParser<T extends BaseEntity> implements IWebParser {
+    protected readonly Writer = ConsoleWriter<T>;
+
     uidProcessed: Set<string> = new Set<string>();;
     contentWriter: IContentWriter<T>;
 
@@ -19,7 +22,7 @@ export default abstract class AbstractWebParser<T extends BaseEntity> implements
 
     saveElement(element: T) {
         if (this.isNewElement(element.uid)) {
-            this.contentWriter.log(element);
+            this.contentWriter && this.contentWriter.log(element);
             this.uidProcessed.add(element.uid);
         }
     }
@@ -48,7 +51,7 @@ export default abstract class AbstractWebParser<T extends BaseEntity> implements
         }
     }
 
-    constructor (contentWriter: IContentWriter<T>) {
-        this.contentWriter = contentWriter;
+    setContentWriter(contentWriter: IContentWriter<T> = null): void {
+        this.contentWriter = contentWriter ?? new this.Writer();
     }
 }
