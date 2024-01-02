@@ -1,7 +1,7 @@
-import type { Page } from "playwright-core";
+import type { Page } from 'playwright-core';
 import URI from 'urijs';
-import BaseEntity from "./BaseEntity";
-import IContentWriter from "./IContentWriter";
+import BaseEntity from './BaseEntity';
+import IContentWriter from './IContentWriter';
 
 export default interface IWebParser<T extends BaseEntity> {
     isParsableUrl(uri: URI): boolean;

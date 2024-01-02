@@ -4,15 +4,17 @@ import { config } from './JsonConfig';
 import IContentWriter from '../base/IContentWriter';
 
 export default class ComponentLoader {
-    
     private classCache = new Map<string, any>();
 
-    private async instantiateClassFromPath<T>(paths: string[], className: string): Promise<T | undefined> {
+    private async instantiateClassFromPath<T>(
+        paths: string[],
+        className: string,
+    ): Promise<T | undefined> {
         if (this.classCache.has(className)) {
             paths = [this.classCache.get(className), ...paths];
         }
         const errors = [];
-        for(let i=0; i<paths.length; i++) {
+        for (let i = 0; i < paths.length; i++) {
             const path = paths[i];
             try {
                 const module = await import(path);
@@ -26,7 +28,9 @@ export default class ComponentLoader {
                 errors.push(error);
             }
         }
-        throw Error(`Error instantiating class: ${className}, ${path}, ${errors}`);
+        throw Error(
+            `Error instantiating class: ${className}, ${path}, ${errors}`,
+        );
     }
 
     private getSearchDirs(fileName: string) {
@@ -34,7 +38,7 @@ export default class ComponentLoader {
             '.',
             path.resolve(__dirname, `../parsers`),
             path.resolve(__dirname, `../writers`),
-            ...(config.sourceDirs ?? [])
+            ...(config.sourceDirs ?? []),
         ].map(v => `${v}/${fileName}`);
     }
 
@@ -43,24 +47,33 @@ export default class ComponentLoader {
         return this.instantiateClassFromPath<T>(paths, parserClassName);
     }
 
-    async loadLogger<T>(loggerClassName: string, parserClassName: string): Promise<T | undefined> {
+    async loadLogger<T>(
+        loggerClassName: string,
+        parserClassName: string,
+    ): Promise<T | undefined> {
         const paths = [
             ...([this.classCache.get(parserClassName)] ?? []),
-            ...this.getSearchDirs(loggerClassName)
+            ...this.getSearchDirs(loggerClassName),
         ];
         try {
             return this.instantiateClassFromPath<T>(paths, loggerClassName);
-        } catch (e) { }
+        } catch (e) {}
     }
 
     async getParsers(): Promise<IWebParser<any>[]> {
         const parsers: IWebParser<any>[] = [];
-        for(var i=0; i<config.parsers.length; i++) {
+        for (var i = 0; i < config.parsers.length; i++) {
             const parserClassName = config.parsers[i].parser;
-            const parser = await this.loadParser<IWebParser<any>>(parserClassName);
+            const parser =
+                await this.loadParser<IWebParser<any>>(parserClassName);
 
             const loggerClassName = config.parsers[i].logger;
-            const logger = loggerClassName ? await this.loadLogger<IContentWriter<any>>(loggerClassName, parserClassName) : undefined;
+            const logger = loggerClassName
+                ? await this.loadLogger<IContentWriter<any>>(
+                      loggerClassName,
+                      parserClassName,
+                  )
+                : undefined;
 
             parser.setContentWriter(logger);
             parsers.push(parser);

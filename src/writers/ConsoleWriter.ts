@@ -1,5 +1,5 @@
-import IContentWriter from "../base/IContentWriter";
-import BaseEntity from "../base/BaseEntity";
+import IContentWriter from '../base/IContentWriter';
+import BaseEntity from '../base/BaseEntity';
 
 export class ConsoleWriter<T extends BaseEntity> implements IContentWriter<T> {
     log(record: T): void {
