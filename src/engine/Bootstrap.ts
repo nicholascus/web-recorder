@@ -4,7 +4,7 @@ import URI from 'urijs';
 import IWebParser from '../base/IWebParser';
 
 export class Bootstrap {
-    componentLoader: ComponentLoader = new ComponentLoader();
+    componentLoader: ComponentLoader = ComponentLoader.getInstance();
     a: Promise<Page>[] = [];
 
     async attachParsers(page: Page) {

@@ -7,6 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "class-transformer": "^0.5.1",
+    "mongodb": "^6.3.0",
     "playwright-core": "^1.40.1",
     "reflect-metadata": "^0.2.1",
     "urijs": "^1.19.11"
@@ -24,6 +25,7 @@
   "scripts": {
     "pwb": "ts-node src/start-playwright.ts",
     "lint": "eslint --ignore-path .eslintignore --ext .js,.ts",
-    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json|yaml|yml)\""
+    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json|yaml|yml)\"",
+    "mongo": "MONGODB_VERSION=6.0-ubi8; docker run --name mongodb -d -p 27017:27017 -v $(pwd)/data:/data/db mongodb/mongodb-community-server:$MONGODB_VERSION"
   }
 }

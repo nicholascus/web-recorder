@@ -1,6 +1,17 @@
 {
   "parsers": [
     { "parser": "LinkedInJobCollections", "logger": "ConsoleWriter" },
-    { "parser": "TwitterFeed" }
+    { "parser": "TwitterFeed", "logger": "MongoDbWriter" }
+  ],
+  "components": [
+    {
+      "name": "MongoDbWriter",
+      "config": [
+        {
+          "param": "connection_string",
+          "value": "mongodb://127.0.0.1:27017/bopilot"
+        }
+      ]
+    }
   ]
 }

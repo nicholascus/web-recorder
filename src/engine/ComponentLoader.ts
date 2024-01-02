@@ -3,8 +3,12 @@ import IWebParser from '../base/IWebParser';
 import { config } from './JsonConfig';
 import IContentWriter from '../base/IContentWriter';
 
+let instance = null;
+
 export default class ComponentLoader {
     private classCache = new Map<string, any>();
+
+    private constructor() {}
 
     private async instantiateClassFromPath<T>(
         paths: string[],
@@ -79,5 +83,28 @@ export default class ComponentLoader {
             parsers.push(parser);
         }
         return parsers;
+    }
+
+    getComponentConfigString(
+        name: string,
+        param: string,
+        def?: string,
+    ): string | undefined {
+        const componentConfig = this.getComponentConfig(name);
+        return componentConfig.filter(v => v.param === param)[0]?.value ?? def;
+    }
+
+    getComponentConfig(name: string): { param: string; value: string }[] {
+        const componentConfig = (config.components ?? []).filter(
+            v => v.name === name,
+        );
+        return componentConfig.length ? componentConfig[0].config : [];
+    }
+
+    static getInstance(): ComponentLoader {
+        if (!instance) {
+            instance = new ComponentLoader();
+        }
+        return instance;
     }
 }
