@@ -24,7 +24,7 @@ jobs:
       - run: yarn tsc
   test:
     runs-on: ubuntu-latest
-    name: Check typescript
+    name: Run tests
     needs: [lint, tsc]
     steps:
       - uses: actions/checkout@v1
