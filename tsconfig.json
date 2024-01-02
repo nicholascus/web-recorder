@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "CommonJS",
+    "outDir": "out",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "strict": false,
+    "lib": [
+    ],
+    "types": [
+        "node",
+        "playwright-core"
+    ],
+    "moduleResolution": "node"
+  }
+}

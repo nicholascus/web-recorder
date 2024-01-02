@@ -1,0 +1,19 @@
+{
+  "name": "playwright-copilot-plain",
+  "version": "1.0.0",
+  "description": "proof of concept for playwright browser watcher",
+  "main": "index.js",
+  "author": "Niko",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^20.10.5",
+    "playwright": "^1.40.1",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "pwb": "ts-node start-playwright.ts"
+  }
+}
