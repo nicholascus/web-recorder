@@ -3,7 +3,7 @@
  * - runner
  *   - loads all parsers
  *   - connect to browser / start browser
- *   - setup all browser tabs with the right parsers => all pages should have on('domcontentloaded', ...) attaching parser for them
+ *   - setup all browser tabs with the right parsers => all pages should have page.on('domcontentloaded', ...) attaching parser in them
  *   - see if the active window is new ? (intiate / reinitiate parser if requried) => context.on('page', ...)
  * - browser manager
  *   - 
@@ -41,6 +41,34 @@ async function findAsyncSequential<T>(
     return undefined;
   }
 
+async function attachParsers(page: Page) {
+    try {
+        await page.bringToFront();
+        const title: string = await page.title();
+        const pageurl: string = page.url();
+        console.log(`Page found. title: ${title} url:${pageurl}`);
+        const url = new URL(pageurl);
+        if (url.host === "twitter.com") {
+            await outputNewTweets(page);                
+            page.on('request', async (...args) => {
+                await outputNewTweets(page);
+            });
+            a.push(page.waitForEvent('close', {
+                timeout: 0,
+                predicate: (p: Page) => {
+                    console.log(`!!PAGE CLOSED!! ${title}`);
+                    return true;
+                }
+            }));
+        } else if (url.host === "linkedin.com" && url.pathname.startsWith("/jobs/collections")) {
+
+        }
+    } catch (e) {
+        console.log(`failed to get page title due to ${e}`)
+    }
+
+}
+
 class Tweet {
     uid: string;
     name: string;
@@ -50,7 +78,7 @@ class Tweet {
     isAd: boolean;
     hasQuote: boolean;
     quote?: Tweet;
-    interactions: { reply: string, retweets: string, like: string};
+    interactions: { reply: string, retweet: string, like: string};
     parent?: Tweet;
 }
 
@@ -96,6 +124,18 @@ class TweetElement {
             }
 
             this.tweet.content = await this.element.getByTestId('tweetText').first().innerText();
+
+            let reply='0', retweet='0', like='0';
+            if ((await this.element.getByTestId('reply').all()).length) {
+                reply  = await this.element.getByTestId('reply').first().innerText();
+            }
+            if ((await this.element.getByTestId('like').all()).length) {
+                like = await this.element.getByTestId('like').first().innerText();
+            }
+            if ((await this.element.getByTestId('retweet').all()).length) {
+                retweet = await this.element.getByTestId('retweet').first().innerText();
+            }
+            this.tweet.interactions = {reply, retweet, like};
         }
         return this.tweet;
     }
@@ -106,6 +146,8 @@ class TweetElement {
 
 const knownTweets: string[] = [];
 
+const a = [];
+
 async function outputNewTweets(page: Page) {
     const tweets: Locator[] = await page.getByTestId('primaryColumn').getByTestId('tweet').all();
 
@@ -115,7 +157,7 @@ async function outputNewTweets(page: Page) {
             const t = await tweet.parse(page);
             // console.log(`\n!FOUND_A_TWEET! ${page.url()} ${t.uid}`);
             if (!knownTweets.includes(t.uid)) {
-                console.log(`\n!FOUND_NEW_TWEET! uid=${t.uid}, isAd=${t.isAd ? "Y" : "N"}, time=${t.time}, user=${t.username}${t.hasQuote ? `\n!!QUOTE!!: uid=${t.quote.uid} user=${t.quote.username} TEXT:${t.quote.content}`:''}\n!!TEXT!!:${t.content}`);
+                console.log(`\n!FOUND_NEW_TWEET! uid=${t.uid}, isAd=${t.isAd ? "Y" : "N"}, time=${t.time}, user=${t.username}${t.hasQuote ? `\n!!QUOTE!!: uid=${t.quote.uid} user=${t.quote.username} TEXT:${t.quote.content}`:''}\n!!TEXT!!:${t.content}\n${JSON.stringify(t.interactions)}`);
                 knownTweets.push(t.uid);
             }
         } catch (e) {
@@ -133,7 +175,6 @@ async function outputNewTweets(page: Page) {
         console.log(`Contexts in CDP session: ${browser.contexts().length}.`);
 
         const contexts: BrowserContext[] = browser.contexts();
-        const a = [];
 
         for(let j=0; j<contexts.length; j++) {
             const context: BrowserContext = contexts[j];
@@ -143,37 +184,13 @@ async function outputNewTweets(page: Page) {
                 console.log('!!NEW PAGE!! need to register to tab list');
                 page.on('domcontentloaded', async (page) => {
                     console.log(await page.title());
+                    await attachParsers(page);
                 });
             });
 
             for(let i=0; i<pages.length; i++) {
                 const page: Page = pages[i];
-                try {
-                    await page.bringToFront();
-                    const title: string = await page.title();
-                    const pageurl: string = page.url();
-                    console.log(`Page found. title: ${title} url:${pageurl}`);
-                    const url = new URL(pageurl);
-                    // console.log(url);
-                    if (url.host === "twitter.com") {
-                        // await outputNewTweets(page);
-                        page.on('request', async (...args) => {
-                            // console.log(`!!Request event!! ${title} ${page.url()}`)
-                            await outputNewTweets(page);
-                        });
-                        a.push(page.waitForEvent('close', {
-                            timeout: 0,
-                            predicate: (p: Page) => {
-                                console.log(`!!PAGE CLOSED!! ${title}`);
-                                return true;
-                            }
-                        }));
-                    } else if (url.host === "linkedin.com" && url.pathname.startsWith("/jobs/collections")) {
-
-                    }
-                } catch (e) {
-                    console.log(`failed to get page title due to ${e}`)
-                }
+                await attachParsers(page);
             }
         }
 
