@@ -6,15 +6,15 @@
   "author": "Niko",
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^20.10.5",
     "class-transformer": "^0.5.1",
-    "playwright": "^1.40.1",
+    "playwright-core": "^1.40.1",
     "reflect-metadata": "^0.2.1",
-    "ts-node": "^10.9.2",
     "urijs": "^1.19.11"
   },
   "devDependencies": {
+    "@types/node": "^20.10.5",
     "@types/urijs": "^1.19.25",
+    "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
   },
   "scripts": {

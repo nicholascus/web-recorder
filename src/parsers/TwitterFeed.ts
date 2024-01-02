@@ -1,4 +1,4 @@
-import { Locator, Page } from 'playwright';  // Or 'firefox' or 'webkit'.
+import { Locator, Page } from 'playwright-core';  // Or 'firefox' or 'webkit'.
 import { URL } from 'url';
 import URI from 'urijs';
 import BaseEntity from '../base/BaseEntity';

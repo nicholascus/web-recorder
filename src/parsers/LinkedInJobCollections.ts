@@ -1,4 +1,4 @@
-import { Locator, Page } from 'playwright';
+import { Locator, Page } from 'playwright-core';
 import URI from 'urijs';
 import AbstractWebParser from '../base/AbastractWebParser';
 import BaseEntity from '../base/BaseEntity';
