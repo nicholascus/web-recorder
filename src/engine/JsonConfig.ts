@@ -1,5 +1,6 @@
 import { plainToClass } from 'class-transformer';
 class JsonConfig {
+    sourceDirs?: string[];
     parsers: { parser: string, loggers: string[] | string }[];
 }
 

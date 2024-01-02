@@ -15,7 +15,7 @@ export class Bootstrap {
             console.log(`Page found. title: ${title} url:${pageurl}`);
             const uri = new URI(pageurl);
     
-            const parsers: IWebParser[] = await this.componentLoader.getParsers();
+            const parsers: IWebParser<any>[] = await this.componentLoader.getParsers();
             
             for(var i=0; i < parsers.length; i++) {
                 const parser = parsers[i];

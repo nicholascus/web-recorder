@@ -5,13 +5,7 @@ import BaseEntity from '../base/BaseEntity';
 import { mapAsyncSequential } from '../engine/Util';
 import IContentWriter from '../base/IContentWriter';
 
-export namespace LinkedInJobCollections {
-    export type Parser = LinkedInJobCollectionsParser;
-    export type DataEntity = Job;
-    export type Writer = LinkedInJobConsoleLogger;
-}
-
-export class LinkedInJobCollectionsParser extends AbstractWebParser<Job> {
+export class LinkedInJobCollections extends AbstractWebParser<Job> {
     protected readonly Writer = LinkedInJobConsoleLogger;
 
     async extractUid(page: Page, element: Locator): Promise<string> {

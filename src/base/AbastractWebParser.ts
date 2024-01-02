@@ -5,7 +5,7 @@ import IWebParser from "./IWebParser";
 import URI from 'urijs';
 import ConsoleWriter from "./ConsoleWriter";
 
-export default abstract class AbstractWebParser<T extends BaseEntity> implements IWebParser {
+export default abstract class AbstractWebParser<T extends BaseEntity> implements IWebParser<T> {
     protected readonly Writer = ConsoleWriter<T>;
 
     uidProcessed: Set<string> = new Set<string>();;
@@ -51,7 +51,7 @@ export default abstract class AbstractWebParser<T extends BaseEntity> implements
         }
     }
 
-    setContentWriter(contentWriter: IContentWriter<T> = null): void {
+    setContentWriter(contentWriter?: IContentWriter<T>): void {
         this.contentWriter = contentWriter ?? new this.Writer();
     }
 }
