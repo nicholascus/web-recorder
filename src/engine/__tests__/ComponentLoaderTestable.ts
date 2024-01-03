@@ -19,4 +19,10 @@ export default class ComponentLoaderTestable extends ComponentLoader {
     getClassCache() {
         return this.classCache;
     }
+
+    setClassCache(classCache: { className: string; path: string }[]) {
+        for (const { className, path } of classCache) {
+            this.classCache.set(className, path);
+        }
+    }
 }

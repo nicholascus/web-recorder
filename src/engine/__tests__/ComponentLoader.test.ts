@@ -1,34 +1,52 @@
 // FILEPATH: /Users/niko/dev/playwright-copilot-plain/src/engine/__tests__/ComponentLoader.test.ts
 import path from 'path';
 import ComponentLoaderTestable from './ComponentLoaderTestable';
+import { MockClass } from './mock-path/MockClass';
 
 describe('ComponentLoader', () => {
     let componentLoader: ComponentLoaderTestable;
+    let classImportPath: string;
     beforeEach(() => {
         componentLoader = ComponentLoaderTestable.getInstance();
+        classImportPath = path.resolve(__dirname, 'mock-path', 'MockClass');
     });
 
     describe('instantiateClassFromPath', () => {
-        it('should instantiate class from path', async () => {
-            const classFolderPath = path.resolve(
-                __dirname,
-                'mock-path',
-                'MockClass',
-            );
+        it.each(['MockClass', 'MockAnotherClass'])(
+            'should instantiate class from path',
+            async className => {
+                const instance =
+                    await componentLoader.instantiateClassFromPathTest(
+                        [classImportPath],
+                        className,
+                    );
+
+                expect(componentLoader.getClassCache().get(className)).toBe(
+                    `${classImportPath}`,
+                );
+            },
+        );
+
+        it('should use cached path if available', async () => {
+            componentLoader.setClassCache([
+                { className: 'MockClass', path: classImportPath },
+            ]);
+
             const instance = await componentLoader.instantiateClassFromPathTest(
-                [classFolderPath],
+                [],
                 'MockClass',
             );
 
-            expect(componentLoader.getClassCache().get('MockClass')).toBe(
-                `${classFolderPath}`,
-            );
+            expect(instance).toBeInstanceOf(MockClass);
         });
 
-        // it('should use cached path if available', async () => {
-        // });
-
-        // it('should throw error if class cannot be instantiated', async () => {
-        // });
+        it('should throw error if class cannot be instantiated', async () => {
+            await expect(
+                componentLoader.instantiateClassFromPathTest(
+                    [classImportPath],
+                    'NonExistentClass',
+                ),
+            ).rejects.toThrow('Error instantiating class: NonExistentClass');
+        });
     });
 });

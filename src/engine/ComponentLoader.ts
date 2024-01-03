@@ -32,9 +32,7 @@ export default class ComponentLoader {
                 errors.push(error);
             }
         }
-        throw Error(
-            `Error instantiating class: ${className}, ${path}, ${errors}`,
-        );
+        throw Error(`Error instantiating class: ${className}, ${path}`);
     }
 
     protected getSearchDirs(fileName: string) {
