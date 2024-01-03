@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Content Parsing Test</title>
+        <style>
+            .item {
+                width: calc(100vw - 20px);
+                height: 200px;
+                background-color: lightgray;
+                margin: 10px auto; /* Updated margin property */
+                display: inline-block;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="item" data-testid="item-1">item 1</div>
+        <div class="item" data-testid="item-2">item 2</div>
+        <div class="item" data-testid="item-3">item 3</div>
+        <div class="item" data-testid="item-4">item 4</div>
+        <div class="item" data-testid="item-5">item 5</div>
+        <script>
+            let nextIndex = 6;
+            function lazyLoadItems() {
+                fetch('content.json')
+                    .then(response => {
+                        return response.json();
+                    })
+                    .then(data => {
+                        const index = nextIndex++;
+                        const newElement = document.createElement('div');
+                        newElement.setAttribute('class', 'item');
+                        newElement.setAttribute('data-testid', 'item-' + index);
+                        newElement.textContent = `${data.text} ${index}`;
+                        document.body.appendChild(newElement);
+                    })
+                    .catch(error => {
+                        console.error('Error loading item content:', error);
+                    });
+            }
+
+            window.addEventListener('scroll', () => {
+                if (
+                    window.innerHeight + window.scrollY >=
+                    document.body.offsetHeight
+                ) {
+                    lazyLoadItems();
+                }
+            });
+        </script>
+    </body>
+</html>

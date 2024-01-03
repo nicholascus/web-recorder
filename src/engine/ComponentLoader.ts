@@ -38,8 +38,8 @@ export default class ComponentLoader {
     protected getSearchDirs(fileName: string) {
         return [
             '.',
-            path.resolve(__dirname, `../parsers`),
-            path.resolve(__dirname, `../writers`),
+            path.resolve(__dirname, '../parsers'),
+            path.resolve(__dirname, '../writers'),
             ...(config.sourceDirs ?? []),
         ].map(v => `${v}/${fileName}`);
     }

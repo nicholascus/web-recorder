@@ -1,0 +1,24 @@
+{
+  "parsers": [{ "parser": "TestParser", "logger": "MongoDbWriter" }],
+  "sourceDirs": ["/Users/niko/dev/playwright-copilot-plain/e2e/test-parser"],
+  "components": [
+    {
+      "name": "MongoDbWriter",
+      "config": [
+        {
+          "param": "connection_string",
+          "value": "mongodb://127.0.0.1:27017/test-bopilot"
+        }
+      ]
+    },
+    {
+      "name": "TestParser",
+      "config": [
+        {
+          "param": "url",
+          "value": "http://127.0.0.1:8080"
+        }
+      ]
+    }
+  ]
+}

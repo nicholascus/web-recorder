@@ -33,3 +33,5 @@ jobs:
           node-version: '20'
       - run: yarn
       - run: yarn test
+      - run: yarn mongo
+      - run: yarn e2e

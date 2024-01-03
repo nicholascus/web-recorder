@@ -5,7 +5,10 @@ class JsonConfig {
     parsers: { parser: string; logger: string }[];
 }
 
-export const config: JsonConfig = plainToClass(
-    JsonConfig,
-    require('../../default-config.json'),
-);
+export let config: JsonConfig;
+
+config || loadJsonConfig('../../default-config.json');
+
+export function loadJsonConfig(configFile: string) {
+    config = plainToClass(JsonConfig, require(configFile));
+}

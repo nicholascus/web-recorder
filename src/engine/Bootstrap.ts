@@ -64,10 +64,10 @@ export class Bootstrap {
         }
     }
 
-    async run() {
+    async run(port: number = 9222) {
         try {
             const browser: Browser = await chromium.connectOverCDP(
-                'http://localhost:9222',
+                `http://localhost:${port}`,
             );
             // browser.on('disconnected', () => process.exit());
 
@@ -76,11 +76,11 @@ export class Bootstrap {
                 `Contexts in CDP session: ${browser.contexts().length}.`,
             );
 
-            await this.attachBrowser(browser);
+            return this.attachBrowser(browser);
 
-            await Promise.all(this.a);
+            // await Promise.all(this.a);
 
-            await browser.close();
+            // await browser.close();
         } catch (error) {
             console.log(`Cannot connect to Chrome.\n${error}`);
         }
