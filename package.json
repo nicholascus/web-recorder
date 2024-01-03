@@ -1,9 +1,8 @@
 {
-  "name": "playwright-copilot-plain",
+  "name": "web-browsing-data-recorder",
   "version": "1.0.0",
-  "description": "proof of concept for playwright browser watcher",
-  "main": "index.js",
-  "author": "Niko",
+  "description": "Parsing, extraction and recording of the web data while you browse websites in desktop web browser.",
+  "author": "Niko G.",
   "license": "MIT",
   "dependencies": {
     "class-transformer": "^0.5.1",
