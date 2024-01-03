@@ -8,7 +8,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
       - run: yarn
       - run: yarn lint
       - run: yarn format --check
@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
       - run: yarn
       - run: yarn tsc
   test:
@@ -30,8 +30,10 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
       - run: yarn
       - run: yarn test
+      - run: yarn playwright install chromium
+      - run: yarn playwright install-deps chromium
       - run: yarn mongo
       - run: yarn e2e
