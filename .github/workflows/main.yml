@@ -6,9 +6,9 @@ jobs:
     name: Run eslint
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '20'
       - run: yarn
       - run: yarn lint
       - run: yarn format --check
@@ -17,9 +17,9 @@ jobs:
     name: Check typescript
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '20'
       - run: yarn
       - run: yarn tsc
   test:
@@ -28,8 +28,8 @@ jobs:
     needs: [lint, tsc]
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '20'
       - run: yarn
       - run: yarn test
