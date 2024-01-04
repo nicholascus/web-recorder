@@ -32,6 +32,7 @@ export default class ComponentLoader {
                 errors.push(error);
             }
         }
+        console.log(paths);
         throw Error(`Error instantiating class: ${className}, ${path}`);
     }
 
@@ -40,7 +41,7 @@ export default class ComponentLoader {
             '.',
             path.resolve(__dirname, '../parsers'),
             path.resolve(__dirname, '../writers'),
-            ...(config.sourceDirs ?? []),
+            ...(config.sourceDirs.map(v => path.resolve(__dirname, '..', '..', v)) ?? []),
         ].map(v => `${v}/${fileName}`);
     }
 

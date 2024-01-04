@@ -54,7 +54,7 @@ function startServer(
 
 let client: MongoClient;
 async function getMongoClient() {
-    const connectionString: string = 'mongodb://127.0.0.1:27017/test-bopilot';
+    const connectionString: string = `mongodb://${process.env.MONGO_SERVER_ADDRESS ?? '127.0.0.1:27017'}/test-bopilot`;
     if (!client) {
         client = await MongoClient.connect(connectionString);
     }
@@ -88,7 +88,7 @@ describe('End-to-End Test', () => {
             args: [`--remote-debugging-port=${browserCdpPort}`],
             headless: true,
         });
-        loadJsonConfig(path.resolve(__dirname, 'test-config.json'));
+        loadJsonConfig(path.resolve(__dirname, `${process.env.CONFIG_FILE ?? 'test-config.json'}`));
         parsingServer = new Bootstrap().run(browserCdpPort);
     });
 
@@ -102,17 +102,19 @@ describe('End-to-End Test', () => {
         client.db().collection('data').deleteMany({});
 
         page = await browser.newPage();
-        await page.goto(`http://localhost:${port}/index.html`);
+        await page.goto(`http://127.0.0.1:${port}/index.html`);
     });
 
     afterEach(async () => {
         await page.close();
     });
 
-    it('should have 5 elements on the page before scrolling', async () => {
+    it('should have test page available in the browser', async () => {
         const title = await page.title();
-        expect(title).toBe('Content Parsing Test'); // <-- we are on the right page
+        expect(title).toBe('Content Parsing Test');
+    });
 
+    it('should have 5 elements on the page before scrolling', async () => {
         expect(
             await waitUntil(
                 async function () {
@@ -148,4 +150,5 @@ describe('End-to-End Test', () => {
             ),
         ).toBe(true);
     });
+
 });

@@ -1,4 +1,3 @@
-// FILEPATH: /Users/niko/dev/playwright-copilot-plain/src/engine/__tests__/ComponentLoader.test.ts
 import path from 'path';
 import ComponentLoaderTestable from './ComponentLoaderTestable';
 import { MockClass } from './mock-path/MockClass';

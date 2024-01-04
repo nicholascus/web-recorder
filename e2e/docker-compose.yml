@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    ports:
+      - 27017
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.40.1-focal
+    volumes:
+      - ../:/app
+    environment:
+      - CONFIG_FILE=test-config.docker-compose.json
+      - MONGO_SERVER_ADDRESS=mongodb:27017
+    working_dir: /app
+    command: bash -c "while true; do sleep 10000; done"
+    depends_on:
+      - mongodb
+
+volumes:
+  mongodb_data:
