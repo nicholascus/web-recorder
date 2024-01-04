@@ -30,7 +30,7 @@
     "typescript": "^5.3.3"
   },
   "scripts": {
-    "pwb": "ts-node src/start-playwright.ts",
+    "wr": "ts-node src/web-recorder.ts",
     "lint": "eslint --ignore-path .eslintignore --ext .js,.ts",
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json|yaml|yml)\"",
     "mongo": "MONGODB_VERSION=6.0-ubi8; docker run --name mongodb -d -p 27017:27017 -v $(pwd)/data:/data/db mongodb/mongodb-community-server:$MONGODB_VERSION",

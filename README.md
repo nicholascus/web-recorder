@@ -2,7 +2,10 @@
 
 ## Description
 This is a lightweight extendable tool which connects to your desktop browser session, and as you browse though the content it extracts and backups data following the logic defined in the parsers.
+
 Parsers are developed with TypeScript and utilise Playwright library for access to the web session over DevTools protocol.
+
+Currently two parsers are available, one for Twitter feeds and one for LinkedIn job collections.
 
 ## Installation
 
@@ -16,7 +19,7 @@ yarn mongo
 # start your desktop browser with DevTools listening to local connections 
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222
 # start web recorder
-yarn pwb
+yarn wr
 ```
 
 ...more detailed documentation is coming soon.
