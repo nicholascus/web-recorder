@@ -55,7 +55,9 @@ jobs:
       - name: Tests
         uses: cloudposse/github-action-docker-compose-test-run@main
         with:
+          workdir: /app
           file: e2e/docker-compose.yml
           service: playwright
           command: yarn && yarn e2e
           registry: registry.hub.docker.com
+          
