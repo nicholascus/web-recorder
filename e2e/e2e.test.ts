@@ -8,6 +8,7 @@ import { Bootstrap } from '../src/engine/Bootstrap';
 import { loadJsonConfig } from '../src/engine/JsonConfig';
 import { MongoClient } from 'mongodb';
 import { waitUntil } from 'async-wait-until';
+import { logger } from '../src/engine/logger';
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 let browserCdpPort: number;
@@ -25,7 +26,7 @@ function startServer(
 
     let listener = app.listen(port, '0.0.0.0', () => {
         address = listener.address() as AddressInfo;
-        console.log(`Server listening on port: ${address.port}`);
+        logger.info(`Server listening on port: ${address.port}`);
     });
 
     listener.close();
@@ -45,7 +46,7 @@ function startServer(
                     }
                 }
             } catch (e) {
-                console.log(`Still down, trying ${count} of ${attempts}`);
+                logger.error(`Still down, trying ${count} of ${attempts}`);
             }
         }
         reject(new Error(`Server is down: ${count} attempts tried`));
@@ -114,7 +115,7 @@ describe('End-to-End Test', () => {
         expect(title).toBe('Content Parsing Test');
     });
 
-    it('should have 5 elements on the page before scrolling', async () => {
+    it('should have 5 elements captured on the page before scrolling', async () => {
         expect(
             await waitUntil(
                 async function () {
@@ -122,7 +123,7 @@ describe('End-to-End Test', () => {
                         .db()
                         .collection('data')
                         .countDocuments({});
-                    // console.log(`documentsCount = ${documentsCount}`);
+                        logger.debug(`documentsCount = ${documentsCount}`);
                     return documentsCount === 5;
                 },
                 10000,
@@ -131,7 +132,7 @@ describe('End-to-End Test', () => {
         ).toBe(true);
     });
 
-    it('should load more content on scroll', async () => {
+    it('should capture more elements as page content lazyloads on scroll', async () => {
         expect(
             await waitUntil(
                 async function () {
@@ -142,7 +143,7 @@ describe('End-to-End Test', () => {
                         .db()
                         .collection('data')
                         .countDocuments({});
-                    // console.log(`documentsCount = ${documentsCount}`);
+                    logger.debug(`documentsCount = ${documentsCount}`);
                     return documentsCount > 15;
                 },
                 10000,

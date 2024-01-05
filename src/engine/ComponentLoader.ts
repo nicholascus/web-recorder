@@ -2,6 +2,7 @@ import path from 'path';
 import IWebParser from '../base/IWebParser';
 import { config } from './JsonConfig';
 import IContentWriter from '../base/IContentWriter';
+import { logger } from './logger'; 
 
 let instance = null;
 
@@ -32,7 +33,7 @@ export default class ComponentLoader {
                 errors.push(error);
             }
         }
-        console.log(paths);
+        logger.error(paths);
         throw Error(`Error instantiating class: ${className}, ${path}`);
     }
 

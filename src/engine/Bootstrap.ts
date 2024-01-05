@@ -2,6 +2,7 @@ import { Browser, BrowserContext, Page, chromium } from 'playwright-core';
 import ComponentLoader from './ComponentLoader';
 import URI from 'urijs';
 import IWebParser from '../base/IWebParser';
+import { logger } from './logger'; 
 
 export class Bootstrap {
     componentLoader: ComponentLoader = ComponentLoader.getInstance();
@@ -12,7 +13,7 @@ export class Bootstrap {
             await page.bringToFront();
             const title: string = await page.title();
             const pageurl: string = page.url();
-            console.log(`Page found. title: ${title} url:${pageurl}`);
+            logger.debug(`Page found. title: ${title} url:${pageurl}`);
             const uri = new URI(pageurl);
 
             const parsers: IWebParser<any>[] =
@@ -29,7 +30,7 @@ export class Bootstrap {
                         page.waitForEvent('close', {
                             timeout: 0,
                             predicate: (p: Page) => {
-                                console.log(`!!PAGE CLOSED!! ${title}`);
+                                logger.debug(`!!PAGE CLOSED!! ${title}`);
                                 return true;
                             },
                         }),
@@ -37,7 +38,7 @@ export class Bootstrap {
                 }
             }
         } catch (e) {
-            console.log(`failed to get page title due to ${e}`);
+            logger.debug(`failed to get page title due to ${e}`);
         }
     }
 
@@ -48,11 +49,11 @@ export class Bootstrap {
             const context: BrowserContext = contexts[j];
             context.setDefaultTimeout(1000);
             const pages: Page[] = context.pages();
-            console.log(`!!CONTEXT!! N${j}`);
+            logger.debug(`!!CONTEXT!! N${j}`);
             context.on('page', page => {
-                console.log('!!NEW PAGE!! need to register to tab list');
+                logger.debug('!!NEW PAGE!! need to register to tab list');
                 page.on('domcontentloaded', async page => {
-                    console.log(await page.title());
+                    logger.debug(await page.title());
                     await this.attachParsers(page);
                 });
             });
@@ -71,8 +72,8 @@ export class Bootstrap {
             );
             // browser.on('disconnected', () => process.exit());
 
-            console.log(browser.isConnected() && 'Connected to Chrome.');
-            console.log(
+            logger.debug(browser.isConnected() && 'Connected to Chrome.');
+            logger.debug(
                 `Contexts in CDP session: ${browser.contexts().length}.`,
             );
 
@@ -82,7 +83,7 @@ export class Bootstrap {
 
             // await browser.close();
         } catch (error) {
-            console.log(`Cannot connect to Chrome.\n${error}`);
+            logger.error(`Cannot connect to Chrome.\n${error}`);
         }
     }
 }
