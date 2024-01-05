@@ -35,29 +35,13 @@ jobs:
       - run: yarn test
   e2e:
     runs-on: ubuntu-latest
-    name: Run end-to-end tests
+    name: Run end-to-end tests in docker-compose
     needs: [test]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - run: yarn      
-      - run: yarn playwright install chromium
-      - run: yarn playwright install-deps chromium
-      - run: yarn mongo
-      - run: yarn e2e
-  e2e-dc:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Tests
-        uses: cloudposse/github-action-docker-compose-test-run@main
-        with:
-          workdir: /app
-          file: e2e/docker-compose.yml
-          service: playwright
-          command: yarn && yarn e2e
-          registry: registry.hub.docker.com
-          
+      - run: yarn
+      - run: docker compose -f e2e/docker-compose.yml up -d
+      - run: docker compose -f e2e/docker-compose.yml exec playwright yarn e2e
