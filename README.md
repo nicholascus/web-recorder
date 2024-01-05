@@ -1,7 +1,8 @@
 # Web Data Recorder
+[![.github/workflows/main.yml](https://github.com/nicholascus/web-recorder/actions/workflows/main.yml/badge.svg)](https://github.com/nicholascus/web-recorder/actions/workflows/main.yml)
 
 ## Description
-This is a lightweight extendable tool which connects to your desktop browser session, and as you browse though the content it extracts and backups data following the logic defined in the parsers.
+"Web Recorder" is a lightweight extendable tool which connects to your desktop browser, and as you browse though the web it extracts and backups data using the logic defined in the parsers.
 
 Parsers are developed with TypeScript and utilise Playwright library for access to the web session over DevTools protocol.
 
