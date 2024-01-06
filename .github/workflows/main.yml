@@ -24,7 +24,7 @@ jobs:
       - run: yarn tsc
   test:
     runs-on: ubuntu-latest
-    name: Run tests
+    name: Jest unit tests
     needs: [lint, tsc]
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
       - run: yarn test
   e2e:
     runs-on: ubuntu-latest
-    name: Run end-to-end tests in docker-compose
+    name: End-to-end tests
     needs: [test]
     steps:
       - uses: actions/checkout@v4
