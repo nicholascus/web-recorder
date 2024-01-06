@@ -5,52 +5,31 @@ import http from 'http';
 import express from 'express';
 import path from 'path';
 import { Bootstrap } from '../src/engine/Bootstrap';
-import { loadJsonConfig } from '../src/engine/JsonConfig';
+import { config, loadJsonConfig } from '../src/engine/JsonConfig';
 import { MongoClient } from 'mongodb';
 import { waitUntil } from 'async-wait-until';
 import { logger } from '../src/engine/logger';
 
-const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 let browserCdpPort: number;
+let server: Server;
 
 function startServer(
     folder: string,
     port = 0,
     interval = 100,
     attempts = 20,
-): Promise<Server> {
+): Promise<number> {
     let address: AddressInfo;
     const app = express();
 
     app.use(express.static(path.resolve(__dirname, 'test-page')));
 
-    let listener = app.listen(port, '0.0.0.0', () => {
-        address = listener.address() as AddressInfo;
+    server = app.listen(port, '0.0.0.0', () => {
+        address = server.address() as AddressInfo;
         logger.info(`Server listening on port: ${address.port}`);
     });
 
-    listener.close();
-
-    return new Promise(async (resolve, reject) => {
-        let count = 0;
-        while (++count < attempts) {
-            await sleep(interval);
-            try {
-                if (address) {
-                    const response = await fetch(
-                        `http://127.0.0.1:${address.port}/index.html`,
-                    );
-                    if (response.ok && response.status === 200) {
-                        resolve(listener);
-                        break;
-                    }
-                }
-            } catch (e) {
-                logger.error(`Still down, trying ${count} of ${attempts}`);
-            }
-        }
-        reject(new Error(`Server is down: ${count} attempts tried`));
-    });
+    return waitUntil(() => address !== undefined && address.port, interval*attempts, interval);
 }
 
 let client: MongoClient;
@@ -70,27 +49,26 @@ function getFreePort(): number {
     return port;
 }
 
-jest.setTimeout(30000);
+jest.setTimeout(10000);
 
 describe('End-to-End Test', () => {
     let browser: ChromiumBrowser;
     let page: Page;
-    let server: Server;
     let port: number;
-    let parsingServer;
     let client: MongoClient;
 
     beforeAll(async () => {
-        server = await startServer('./test-page', 8080);
-        port = (server.address() as AddressInfo).port;
+        port = await startServer('./test-page');
 
         browserCdpPort = getFreePort();
         browser = await chromium.launch({
             args: [`--remote-debugging-port=${browserCdpPort}`],
             headless: true,
         });
+
         loadJsonConfig(path.resolve(__dirname, `${process.env.CONFIG_FILE ?? 'test-config.json'}`));
-        parsingServer = new Bootstrap().run(browserCdpPort);
+        config.setComponentConfig('TestParser', 'url', `http://127.0.0.1:${port}`);
+        new Bootstrap().run(browserCdpPort);
     });
 
     afterAll(async () => {
@@ -110,12 +88,16 @@ describe('End-to-End Test', () => {
         await page.close();
     });
 
-    it('should have test page available in the browser', async () => {
+    afterAll(async () => {
+        server.close();
+    });
+
+    it('should be able to see test page in the browser (while Web Recorder connected to browser too)', async () => {
         const title = await page.title();
         expect(title).toBe('Content Parsing Test');
     });
 
-    it('should have 5 elements captured on the page before scrolling', async () => {
+    it('should see 5 elements from the page captured to mongodb before scrolling', async () => {
         expect(
             await waitUntil(
                 async function () {
@@ -132,7 +114,7 @@ describe('End-to-End Test', () => {
         ).toBe(true);
     });
 
-    it('should capture more elements as page content lazyloads on scroll', async () => {
+    it('should see more elements captured from the page to mongodb as the page is scrolled through in the browser', async () => {
         expect(
             await waitUntil(
                 async function () {
