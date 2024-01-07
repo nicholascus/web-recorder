@@ -2,7 +2,7 @@ import path from 'path';
 import IWebParser from '../base/IWebParser';
 import { config } from './JsonConfig';
 import IContentWriter from '../base/IContentWriter';
-import { logger } from './logger'; 
+import { logger } from './logger';
 
 let instance = null;
 
@@ -38,12 +38,16 @@ export default class ComponentLoader {
     }
 
     protected getSearchDirs(fileName: string) {
-        return [
+        const dirs = [
             '.',
             path.resolve(__dirname, '../parsers'),
             path.resolve(__dirname, '../writers'),
-            ...(config.sourceDirs.map(v => path.resolve(__dirname, '..', '..', v)) ?? []),
-        ].map(v => `${v}/${fileName}`);
+            ...[...(config.sourceDirs ?? [])].map(v =>
+                path.resolve(__dirname, '..', '..', v),
+            ),
+        ];
+        const res = dirs.map(v => `${v}/${fileName}`);
+        return res;
     }
 
     async loadParser<T>(parserClassName: string): Promise<T | undefined> {

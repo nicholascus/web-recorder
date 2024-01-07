@@ -1,7 +1,7 @@
 {
   "parsers": [
     { "parser": "LinkedInJobCollections", "logger": "ConsoleWriter" },
-    { "parser": "TwitterFeed", "logger": "MongoDbWriter" }
+    { "parser": "TwitterFeed", "logger": "RemoteWriter" }
   ],
   "components": [
     {
@@ -10,6 +10,19 @@
         {
           "param": "connection_string",
           "value": "mongodb://127.0.0.1:27017/bopilot"
+        }
+      ]
+    },
+    {
+      "name": "RemoteWriter",
+      "config": [
+        {
+          "param": "server_content_endpoint",
+          "value": "http://127.0.0.1:8080/api/content"
+        },
+        {
+          "param": "api_secret",
+          "value": "<secret>"
         }
       ]
     }
