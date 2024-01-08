@@ -33,7 +33,7 @@ jobs:
           node-version: '18'
       - run: yarn
       - run: yarn test
-  e2e:
+  test-e2e:
     runs-on: ubuntu-latest
     name: End-to-end tests
     needs: [test]
@@ -42,6 +42,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - run: yarn
-      - run: docker compose -f e2e/docker-compose.yml up -d
-      - run: docker compose -f e2e/docker-compose.yml exec playwright yarn e2e
+      - run: yarn test/e2e/docker
+  test-system:
+    runs-on: ubuntu-latest
+    name: End-to-end tests
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Load DigitalOcean Docker Registry config
+        env:
+          DOCKER_CONFIG: ${{ secrets.DOCKER_CONFIG }}
+        run: |
+          echo $DOCKER_CONFIG | base64 -d > $HOME/.docker/config.json
+      - run: yarn test/system/docker
