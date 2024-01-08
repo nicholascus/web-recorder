@@ -45,7 +45,7 @@ jobs:
       - run: yarn test/e2e/docker
   test-system:
     runs-on: ubuntu-latest
-    name: End-to-end tests
+    name: System tests
     needs: [test]
     steps:
       - uses: actions/checkout@v4
