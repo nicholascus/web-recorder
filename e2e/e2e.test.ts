@@ -29,12 +29,18 @@ function startServer(
         logger.info(`Server listening on port: ${address.port}`);
     });
 
-    return waitUntil(() => address !== undefined && address.port, interval*attempts, interval);
+    return waitUntil(
+        () => address !== undefined && address.port,
+        interval * attempts,
+        interval,
+    );
 }
 
 let client: MongoClient;
 async function getMongoClient() {
-    const connectionString: string = `mongodb://${process.env.MONGO_SERVER_ADDRESS ?? '127.0.0.1:27017'}/test-bopilot`;
+    const connectionString: string = `mongodb://${
+        process.env.MONGO_SERVER_ADDRESS ?? '127.0.0.1:27017/test-bopilot'
+    }`;
     if (!client) {
         client = await MongoClient.connect(connectionString);
     }
@@ -56,6 +62,7 @@ describe('End-to-End Test', () => {
     let page: Page;
     let port: number;
     let client: MongoClient;
+    const testCollection: string = process.env.MONGO_COLLECTION ?? 'data';
 
     beforeAll(async () => {
         port = await startServer('./test-page');
@@ -66,8 +73,18 @@ describe('End-to-End Test', () => {
             headless: true,
         });
 
-        loadJsonConfig(path.resolve(__dirname, `${process.env.CONFIG_FILE ?? 'test-config.json'}`));
-        config.setComponentConfig('TestParser', 'url', `http://127.0.0.1:${port}`);
+        loadJsonConfig(
+            path.resolve(
+                __dirname,
+                `${process.env.CONFIG_FILE ?? 'test-config.json'}`,
+            ),
+        );
+        config.setComponentConfig(
+            'TestParser',
+            'url',
+            `http://127.0.0.1:${port}`,
+        );
+        logger.debug(config, 'config');
         new Bootstrap().run(browserCdpPort);
     });
 
@@ -78,7 +95,7 @@ describe('End-to-End Test', () => {
 
     beforeEach(async () => {
         client = await getMongoClient();
-        client.db().collection('data').deleteMany({});
+        client.db().collection(testCollection).deleteMany({});
 
         page = await browser.newPage();
         await page.goto(`http://127.0.0.1:${port}/index.html`);
@@ -103,9 +120,9 @@ describe('End-to-End Test', () => {
                 async function () {
                     const documentsCount = await client
                         .db()
-                        .collection('data')
+                        .collection(testCollection)
                         .countDocuments({});
-                        logger.debug(`documentsCount = ${documentsCount}`);
+                    logger.debug(`documentsCount = ${documentsCount}`);
                     return documentsCount === 5;
                 },
                 10000,
@@ -123,7 +140,7 @@ describe('End-to-End Test', () => {
                     );
                     const documentsCount = await client
                         .db()
-                        .collection('data')
+                        .collection(testCollection)
                         .countDocuments({});
                     logger.debug(`documentsCount = ${documentsCount}`);
                     return documentsCount > 15;
@@ -133,5 +150,4 @@ describe('End-to-End Test', () => {
             ),
         ).toBe(true);
     });
-
 });

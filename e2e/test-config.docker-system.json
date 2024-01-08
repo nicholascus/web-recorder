@@ -1,0 +1,28 @@
+{
+  "parsers": [{ "parser": "TestParser", "logger": "RemoteWriter" }],
+  "sourceDirs": ["e2e/test-parser"],
+  "components": [
+    {
+      "name": "RemoteWriter",
+      "config": [
+        {
+          "param": "server_content_endpoint",
+          "value": "http://web-recorder-server:9000/api/content"
+        },
+        {
+          "param": "api_secret",
+          "value": "B7dv4p8C8hZiTBCC6S2K6wyB"
+        }
+      ]
+    },
+    {
+      "name": "TestParser",
+      "config": [
+        {
+          "param": "url",
+          "value": "http://127.0.0.1:8080"
+        }
+      ]
+    }
+  ]
+}

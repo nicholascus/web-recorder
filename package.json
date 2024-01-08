@@ -38,6 +38,8 @@
     "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json|yaml|yml)\"",
     "mongo": "MONGODB_VERSION=6.0-ubi8; docker run --name mongodb -d -p 27017:27017 -v $(pwd)/data:/data/db mongodb/mongodb-community-server:$MONGODB_VERSION",
     "test": "jest",
-    "e2e": "jest --testMatch='**/e2e/**/*.test.ts' --forceExit"
+    "test/e2e": "jest --testMatch='**/e2e/**/*.test.ts' --forceExit",
+    "test/e2e/docker": "F=e2e/docker-compose.e2e.yml; docker compose -f $F up --force-recreate --remove-orphans -d && docker compose -f $F exec playwright yarn && docker compose -f $F exec playwright yarn test/e2e",
+    "test/system/docker": "F=e2e/docker-compose.system.yml; docker compose -f $F up --force-recreate --remove-orphans -d && docker compose -f $F exec playwright yarn && docker compose -f $F exec playwright yarn test/e2e"
   }
 }

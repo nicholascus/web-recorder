@@ -2,7 +2,7 @@ import { Browser, BrowserContext, Page, chromium } from 'playwright-core';
 import ComponentLoader from './ComponentLoader';
 import URI from 'urijs';
 import IWebParser from '../base/IWebParser';
-import { logger } from './logger'; 
+import { logger } from './logger';
 
 export class Bootstrap {
     componentLoader: ComponentLoader = ComponentLoader.getInstance();

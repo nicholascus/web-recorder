@@ -1,0 +1,41 @@
+version: '3.9'
+services:
+  mongodb:
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    ports:
+      - 27017
+
+  web-recorder-server:
+    image: registry.digitalocean.com/webrecorder/web-recorder/server:main-latest
+    entrypoint:
+      [
+        'java',
+        '-jar',
+        '/app.jar',
+        '--spring.data.mongodb.uri=mongodb://mongodb:27017/content',
+        '--server.port=9000',
+      ]
+    healthcheck:
+      test: "curl http://localhost:9000 | grep 'Invalid API Key'"
+      interval: 4s
+      timeout: 120s
+      retries: 30
+      start_period: 10s
+    depends_on:
+      - mongodb
+    ports:
+      - 9000
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.40.1-focal
+    volumes:
+      - ../:/app
+    environment:
+      - CONFIG_FILE=test-config.docker-system.json
+      - MONGO_SERVER_ADDRESS=mongodb:27017/content
+      - MONGO_COLLECTION=server
+    working_dir: /app
+    command: bash -c "while true; do sleep 10000; done"
+    depends_on:
+      web-recorder-server:
+        condition: service_healthy

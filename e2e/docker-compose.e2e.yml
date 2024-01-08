@@ -11,12 +11,10 @@ services:
     volumes:
       - ../:/app
     environment:
-      - CONFIG_FILE=test-config.docker-compose.json
-      - MONGO_SERVER_ADDRESS=mongodb:27017
+      - CONFIG_FILE=test-config.docker-e2e.json
+      - MONGO_SERVER_ADDRESS=mongodb:27017/test-bopilot
+      - MONGO_COLLECTION=data
     working_dir: /app
     command: bash -c "while true; do sleep 10000; done"
     depends_on:
       - mongodb
-
-volumes:
-  mongodb_data:
